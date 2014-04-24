@@ -25,16 +25,18 @@ namespace LINQExploration
         {
 
             var e = new Employee { EmpId = 1, FirstName = "Magesh", LastName = "Kuppan" };
-            Console.WriteLine(MyUtils.Format(e));
+            //Console.WriteLine(MyUtils.Format(e));
+            Console.WriteLine(e.Format());
             Console.WriteLine();
             var products = new Products();
-            products.Add(new Product { Id = 101, Name = "pen", Cost = 90, Units = 10 });
-            products.Add(new Product { Id = 104, Name = "ten", Cost = 30, Units = 80 });
-            products.Add(new Product { Id = 109, Name = "den", Cost = 70, Units = 20 });
-            products.Add(new Product { Id = 103, Name = "len", Cost = 50, Units = 70 });
-            products.Add(new Product { Id = 107, Name = "ken", Cost = 60, Units = 30 });
-            products.Add(new Product { Id = 102, Name = "zen", Cost = 40, Units = 40 });
+            products.Add(new Product { Id = 101, Name = "pen", Cost = 90, Units = 10, Category=1 });
+            products.Add(new Product { Id = 104, Name = "ten", Cost = 30, Units = 80, Category = 2 });
+            products.Add(new Product { Id = 109, Name = "den", Cost = 70, Units = 20, Category = 1 });
+            products.Add(new Product { Id = 103, Name = "len", Cost = 50, Units = 70, Category = 2 });
+            products.Add(new Product { Id = 107, Name = "ken", Cost = 60, Units = 30, Category = 1 });
+            products.Add(new Product { Id = 102, Name = "zen", Cost = 40, Units = 40, Category = 2 });
 
+            
             Console.WriteLine("Initial list..");
             /*
              * for(var i=0;i<products.Count;i++)
@@ -108,7 +110,7 @@ namespace LINQExploration
     //public delegate bool ProductSpecificationDelegate(Product product);
 
 
-    public class Products: IEnumerable, IEnumerator
+    public class Products: IEnumerable, IEnumerator, IEnumerable<Product>, IEnumerator<Product>
     {
         private ArrayList list = new ArrayList();
         public void Add(Product p) {
@@ -143,6 +145,7 @@ namespace LINQExploration
 
         //public Products Search(ProductSpecificationDelegate productSpec)
         //public Products Search(Func<Product,bool> productSpec)
+        /* Moving this below to MyUtils
         public IEnumerable Search(Predicate<Product> productSpec)
         {
             //var result = new Products();
@@ -155,6 +158,7 @@ namespace LINQExploration
             }
             //return result;
         }
+         */
 
         int index = -1;
         public IEnumerator GetEnumerator()
@@ -186,42 +190,23 @@ namespace LINQExploration
             index = -1;
         }
 
-        public int Min(Func<Product,int> fieldSelector){
-            var result = int.MaxValue;
-            foreach (var item in list)
-	        {
-		        var product = (Product)item;
-                var pValue = fieldSelector(product);
-                if (pValue < result) result = pValue;
 
-	        }
-            return result;
-        }
 
-        public int Max(Func<Product,int> fieldSelector)
+
+        Product IEnumerator<Product>.Current
         {
-            var result = int.MinValue;
-            foreach (var item in list)
-            {
-                var product = (Product)item;
-                var pValue = fieldSelector(product);
-                if (pValue > result) result = pValue;
-
-            }
-            return result;
+            get { return (Product)list[index] ; }
         }
 
-        public Decimal Average(Func<Product,Decimal> fieldSelector)
+        public void Dispose()
         {
-            var total = (decimal)0;
-            foreach(var item in list){
-                var product = (Product)item;
-                var pValue = fieldSelector(product);
-                total += pValue;
-            }
-            return total / list.Count;
+            //throw new NotImplementedException();
         }
 
+        IEnumerator<Product> IEnumerable<Product>.GetEnumerator()
+        {
+            return this;
+        }
     }
 
     /*
@@ -237,6 +222,7 @@ namespace LINQExploration
         public string Name { get; set; }
         public decimal Cost { get; set; }
         public int Units { get; set; }
+        public int Category { get; set; }
         /*public override string ToString()
         {
             return string.Format("Id = {0}\tName = {1}\tCost = {2}\tUnits = {3}", this.Id, this.Name, this.Cost, this.Units);
@@ -245,7 +231,7 @@ namespace LINQExploration
 
     public static class MyUtils
     {
-        public static string Format(object o) {
+        public static string Format(this object o) {
             var t = o.GetType();
             var props = t.GetProperties();
             var result = string.Empty;
@@ -260,6 +246,58 @@ namespace LINQExploration
                 }
             }
             return result;
+        }
+
+        public static int Min<T>(this IEnumerable list, Func<T, int> fieldSelector)
+        {
+            var result = int.MaxValue;
+            foreach (var item in list)
+            {
+                var product = (T)item;
+                var pValue = fieldSelector(product);
+                if (pValue < result) result = pValue;
+
+            }
+            return result;
+        }
+
+        public static int Max<T>(this IEnumerable list, Func<T, int> fieldSelector)
+        {
+            var result = int.MinValue;
+            foreach (var item in list)
+            {
+                var product = (T)item;
+                var pValue = fieldSelector(product);
+                if (pValue > result) result = pValue;
+
+            }
+            return result;
+        }
+
+        public static Decimal Average<T>(this IEnumerable list, Func<T, Decimal> fieldSelector)
+        {
+            var total = (decimal)0;
+            var count = 0;
+            foreach (var item in list)
+            {
+                var product = (T)item;
+                var pValue = fieldSelector(product);
+                total += pValue;
+                count++;
+            }
+            return total / count;
+        }
+        public static IEnumerable<T> Search<T>(this IEnumerable<T> list, Predicate<T> productSpec)
+        {
+            //var result = new Products();
+            foreach (var item in list)
+            {
+                var product = (T)item;
+                if (productSpec(product))
+                    //result.Add(product);
+                    yield return product;
+            }
+            //return result;
         }
     }
 
