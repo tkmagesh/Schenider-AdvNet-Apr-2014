@@ -7,10 +7,26 @@ using System.Threading.Tasks;
 
 namespace LINQExploration
 {
+    public class Employee
+    {
+        [DisplayName("Emp Id")]
+        [IgnoreDisplay]
+        public int EmpId { get; set; }
+
+        [DisplayName("First Name")]
+        public string FirstName { get; set; }
+
+        [DisplayName("Last Name")]
+        public string LastName { get; set; }
+    }
     class Program
     {
         static void Main(string[] args)
         {
+
+            var e = new Employee { EmpId = 1, FirstName = "Magesh", LastName = "Kuppan" };
+            Console.WriteLine(MyUtils.Format(e));
+            Console.WriteLine();
             var products = new Products();
             products.Add(new Product { Id = 101, Name = "pen", Cost = 90, Units = 10 });
             products.Add(new Product { Id = 104, Name = "ten", Cost = 30, Units = 80 });
@@ -25,7 +41,7 @@ namespace LINQExploration
                 Console.WriteLine(products.GetByIndex(i).ToString());
              **/
             foreach(var product in products)
-                Console.WriteLine(product);
+                Console.WriteLine(MyUtils.Format(product));
 
             Console.WriteLine("Costly product list..");
             //var costlyProductSpec = new CostlyProductSpecificaion(40);
@@ -49,7 +65,7 @@ namespace LINQExploration
 
 
             foreach (var product in costlyProducts)
-                    Console.WriteLine(product);
+                    Console.WriteLine(MyUtils.Format(product));
 
             Console.WriteLine("Min product id is ");
             Console.WriteLine(products.Min(p => p.Id));
@@ -127,16 +143,17 @@ namespace LINQExploration
 
         //public Products Search(ProductSpecificationDelegate productSpec)
         //public Products Search(Func<Product,bool> productSpec)
-        public Products Search(Predicate<Product> productSpec)
+        public IEnumerable Search(Predicate<Product> productSpec)
         {
-            var result = new Products();
+            //var result = new Products();
             foreach (var item in list)
             {
                 var product = (Product)item;
                 if (productSpec(product))
-                    result.Add(product);
+                    //result.Add(product);
+                    yield return product;
             }
-            return result;
+            //return result;
         }
 
         int index = -1;
@@ -220,10 +237,52 @@ namespace LINQExploration
         public string Name { get; set; }
         public decimal Cost { get; set; }
         public int Units { get; set; }
-        public override string ToString()
+        /*public override string ToString()
         {
             return string.Format("Id = {0}\tName = {1}\tCost = {2}\tUnits = {3}", this.Id, this.Name, this.Cost, this.Units);
+        }*/
+    }
+
+    public static class MyUtils
+    {
+        public static string Format(object o) {
+            var t = o.GetType();
+            var props = t.GetProperties();
+            var result = string.Empty;
+            foreach (var pInfo in props){
+                if (pInfo.GetCustomAttributes(typeof(IgnoreDisplay),true).Length == 0){
+                    var displayNameAttributes = pInfo.GetCustomAttributes(typeof(DisplayNameAttribute), true);
+                    var displayName = pInfo.Name;
+                    if (displayNameAttributes.Length > 0){
+                        displayName = ((DisplayNameAttribute) displayNameAttributes[0]).Name;
+                    }
+                    result += displayName + " = " + pInfo.GetValue(o, null) + "\t";
+                }
+            }
+            return result;
         }
     }
+
+    
+    [AttributeUsage(AttributeTargets.Property)]
+    public class DisplayNameAttribute : Attribute
+    {
+        string _name = string.Empty;
+        public DisplayNameAttribute(string name)
+        {
+            _name = name;
+        }
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+
+    }
+
+    [AttributeUsage(AttributeTargets.Property)]
+    public class IgnoreDisplay : Attribute { }
 
 }
