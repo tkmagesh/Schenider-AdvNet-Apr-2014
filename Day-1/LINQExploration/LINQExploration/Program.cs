@@ -80,6 +80,16 @@ namespace LINQExploration
             Console.WriteLine("Average product cost is ");
             Console.WriteLine(products.Average(p => p.Cost));
             Console.WriteLine();
+
+            Console.WriteLine("Products Category...");
+            var categorizedProducts = products.GroupBy(p => p.Category);
+            foreach (var group in categorizedProducts)
+            {
+                Console.WriteLine("Category = {0}",group.Key);
+                foreach(var item in group.Value)
+                    Console.WriteLine(item.Format());
+                Console.WriteLine();
+            }
             Console.ReadLine();
         }
 
@@ -298,6 +308,16 @@ namespace LINQExploration
                     yield return product;
             }
             //return result;
+        }
+        public static IDictionary<TKey, IList<T>> GroupBy<T, TKey>(this IEnumerable<T> list, Func<T, TKey> keySelector) {
+            var result = new Dictionary<TKey, IList<T>>();
+            foreach (var item in list) {
+                var key = keySelector(item);
+                if (!result.ContainsKey(key))
+                    result[key] = new List<T>();
+                result[key].Add(item);
+            }
+            return result;
         }
     }
 
