@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEFDemo", "MEFDemo\MEFDemo.csproj", "{190D7901-E8EF-4B2A-9CD0-F7243AA6991A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MEFDemo.Contracts", "MEFDemo.Contracts\MEFDemo.Contracts.csproj", "{D3BFE0E6-C51D-48BB-AB64-F4C159F9B28B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{190D7901-E8EF-4B2A-9CD0-F7243AA6991A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{190D7901-E8EF-4B2A-9CD0-F7243AA6991A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{190D7901-E8EF-4B2A-9CD0-F7243AA6991A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3BFE0E6-C51D-48BB-AB64-F4C159F9B28B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3BFE0E6-C51D-48BB-AB64-F4C159F9B28B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3BFE0E6-C51D-48BB-AB64-F4C159F9B28B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3BFE0E6-C51D-48BB-AB64-F4C159F9B28B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
