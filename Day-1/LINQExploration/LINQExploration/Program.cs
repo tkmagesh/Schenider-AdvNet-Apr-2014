@@ -50,6 +50,18 @@ namespace LINQExploration
 
             foreach (var product in costlyProducts)
                     Console.WriteLine(product);
+
+            Console.WriteLine("Min product id is ");
+            Console.WriteLine(products.Min(p => p.Id));
+            Console.WriteLine();
+
+            Console.WriteLine("Max product id is ");
+            Console.WriteLine(products.Max(p => p.Id));
+            Console.WriteLine();
+
+            Console.WriteLine("Average product cost is ");
+            Console.WriteLine(products.Average(p => p.Cost));
+            Console.WriteLine();
             Console.ReadLine();
         }
 
@@ -77,7 +89,7 @@ namespace LINQExploration
         }
     }
 
-    public delegate bool ProductSpecificationDelegate(Product product);
+    //public delegate bool ProductSpecificationDelegate(Product product);
 
 
     public class Products: IEnumerable, IEnumerator
@@ -113,7 +125,9 @@ namespace LINQExploration
             return result;
         }
 
-        public Products Search(ProductSpecificationDelegate productSpec)
+        //public Products Search(ProductSpecificationDelegate productSpec)
+        //public Products Search(Func<Product,bool> productSpec)
+        public Products Search(Predicate<Product> productSpec)
         {
             var result = new Products();
             foreach (var item in list)
@@ -154,7 +168,51 @@ namespace LINQExploration
         {
             index = -1;
         }
+
+        public int Min(Func<Product,int> fieldSelector){
+            var result = int.MaxValue;
+            foreach (var item in list)
+	        {
+		        var product = (Product)item;
+                var pValue = fieldSelector(product);
+                if (pValue < result) result = pValue;
+
+	        }
+            return result;
+        }
+
+        public int Max(Func<Product,int> fieldSelector)
+        {
+            var result = int.MinValue;
+            foreach (var item in list)
+            {
+                var product = (Product)item;
+                var pValue = fieldSelector(product);
+                if (pValue > result) result = pValue;
+
+            }
+            return result;
+        }
+
+        public Decimal Average(Func<Product,Decimal> fieldSelector)
+        {
+            var total = (decimal)0;
+            foreach(var item in list){
+                var product = (Product)item;
+                var pValue = fieldSelector(product);
+                total += pValue;
+            }
+            return total / list.Count;
+        }
+
     }
+
+    /*
+    public delegate int IntFieldSelectorDelegate(Product p);
+    public delegate decimal DecimalFieldSelector(Product p);
+    */
+
+    //public delegate TResult FieldSelector<T, TResult>(T t);
 
     public class Product
     {
